@@ -69,7 +69,7 @@ service-ryere:
   fullnameOverride: service-ryere
   image:
     repository: ghcr.io/hongchaodeng/service-ryere-repo
-    tag: latest
+    tag: ce61ff5
   imagePullSecrets:
     - name: app-bdezn-docker
   ingress:
