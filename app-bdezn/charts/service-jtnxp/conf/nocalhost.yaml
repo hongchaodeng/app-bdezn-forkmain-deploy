@@ -1,0 +1,51 @@
+containers:
+  - name: {{ .Chart.Name }}
+    dev:
+      gitUrl: {{ .Values.nocalhost.gitURL }}
+      image: {{ .Values.nocalhost.image }}
+      shell: bash
+      workDir: /home/nocalhost-dev
+      command:
+        run:
+          {{- range .Values.nocalhost.command.run }}
+          - {{ . | quote }}
+          {{- end }}
+        debug:
+          {{- range .Values.nocalhost.command.run }}
+          - {{ . | quote }}
+          {{- end }}
+      debug:
+        language: {{ .Values.nocalhost.language }}
+        remoteDebugPort: {{ .Values.nocalhost.remoteDebugPort }}
+      hotReload: {{ .Values.nocalhost.hotReload }}
+      sync:
+        type: send
+        filePattern:
+          - ./
+        ignoreFilePattern:
+          - ".git"
+          - ".idea"
+          - ".github"
+          - "node_modules"
+      resources:
+        limits:
+          cpu: "4"
+          memory: 4Gi
+        requests:
+          cpu: "0.1"
+          memory: 256Mi
+      persistentVolumeDirs:
+        {{- range .Values.nocalhost.persistentVolumeDirs }}
+        - path: {{ .path }}
+          capacity: {{ .capacity | quote }}
+        {{- end }}
+      env:
+        {{- range .Values.nocalhost.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+      patches:
+        {{- range .Values.nocalhost.patches }}
+        - patch: {{ .patch | squote }}
+          type: {{ .type }}
+        {{- end }}

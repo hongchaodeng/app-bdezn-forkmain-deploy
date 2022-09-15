@@ -1,0 +1,112 @@
+postgresql:
+  auth:
+    database: database
+    postgresPassword: password
+  fullnameOverride: postgresql
+  image:
+    tag: "14"
+  primary:
+    persistence:
+      size: 20Gi
+service-jtnxp:
+  env:
+  - name: ENV_NAME
+    value: main
+  - name: ENV_DOMAIN
+    value: app-bdezn-4lbkxjx7v.forkmain.cloud
+  fullnameOverride: service-jtnxp
+  image:
+    repository: ghcr.io/hongchaodeng/service-jtnxp-repo
+    tag: latest
+  imagePullSecrets:
+  - name: app-bdezn-docker
+  ingress:
+    className: nginx
+    enabled: true
+    hosts:
+    - host: app-bdezn-4lbkxjx7v.forkmain.cloud
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+  nocalhost:
+    command:
+      debug:
+      - ""
+      run:
+      - yarn
+      - install
+      - '&&'
+      - yarn
+      - dev
+    configPath: conf/nocalhost.yaml
+    env: null
+    gitURL: https://github.com/hongchaodeng/service-jtnxp-repo.git
+    hotReload: false
+    image: nocalhost-docker.pkg.coding.net/nocalhost/dev-images/node:latest
+    language: javascript
+    patches: null
+    persistentVolumeDirs:
+    - capacity: 20Gi
+      path: /home/nocalhost-dev
+    remoteDebugPort: 9009
+  service:
+    port: 3000
+    targetPort: 3000
+service-ryere:
+  env:
+  - name: ENV_NAME
+    value: main
+  - name: ENV_DOMAIN
+    value: app-bdezn-4lbkxjx7v.forkmain.cloud
+  - name: DatabaseUser
+    value: postgres
+  - name: DatabasePassword
+    value: password
+  - name: DatabaseHost
+    value: postgresql
+  - name: DB_NAME
+    value: database
+  fullnameOverride: service-ryere
+  image:
+    repository: ghcr.io/hongchaodeng/service-ryere-repo
+    tag: latest
+  imagePullSecrets:
+  - name: app-bdezn-docker
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$2$3
+    className: nginx
+    enabled: true
+    hosts:
+    - host: app-bdezn-4lbkxjx7v.forkmain.cloud
+      paths:
+      - path: /(api/|api$)(.*)
+        pathType: ImplementationSpecific
+  nocalhost:
+    command:
+      debug:
+      - go
+      - run
+      - main.go
+      run:
+      - go
+      - run
+      - main.go
+    configPath: conf/nocalhost.yaml
+    env:
+    - name: GOCACHE
+      value: /go/.cache
+    gitURL: https://github.com/hongchaodeng/service-ryere-repo.git
+    hotReload: false
+    image: heighlinerdev/dev-golang:1.19
+    language: go
+    patches: null
+    persistentVolumeDirs:
+    - capacity: 20Gi
+      path: /home/nocalhost-dev
+    - capacity: 20Gi
+      path: /go
+    remoteDebugPort: 9009
+  service:
+    port: 8000
+    targetPort: 8000
